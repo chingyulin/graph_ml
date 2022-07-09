@@ -1,11 +1,12 @@
 import pandas as pd
 import torch
 from ogb.nodeproppred import Evaluator
+from torch_geometric.data import Data
 
 from graph_ml.model import GCN
 
 
-def train(model: GCN, data, train_idx, optimizer, loss_fn):
+def train(model: GCN, data: Data, train_idx, optimizer, loss_fn):
     model.train()
     optimizer.zero_grad()
     out = model(data.x, data.adj_t)
@@ -19,7 +20,9 @@ def train(model: GCN, data, train_idx, optimizer, loss_fn):
 
 # Test function here
 @torch.no_grad()
-def test(model, data, split_idx, evaluator: Evaluator, save_model_results=False):
+def test(
+    model: GCN, data: Data, split_idx, evaluator: Evaluator, save_model_results=False
+):
 
     model.eval()
     out = model(data.x, data.adj_t)
@@ -50,9 +53,7 @@ def test(model, data, split_idx, evaluator: Evaluator, save_model_results=False)
 
         data = {}
         data["y_pred"] = y_pred.view(-1).cpu().detach().numpy()
-
         df = pd.DataFrame(data=data)
-        # Save locally as csv
         df.to_csv("local_ogbn-arxiv_node.csv", sep=",", index=False)
 
     return train_acc, valid_acc, test_acc

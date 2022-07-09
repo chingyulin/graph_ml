@@ -10,22 +10,20 @@ from graph_ml.ogb_wrapper import Evaluator, PygNodePropPredDataset
 from graph_ml.trainer import test, train
 
 if __name__ == "__main__":
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     dataset_name = "ogbn-arxiv"
     dataset = PygNodePropPredDataset(
         name=dataset_name, root="dataset", transform=T.ToSparseTensor()
     )
     data: Data = dataset[0]
     data.adj_t = data.adj_t.to_symmetric()
-
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-
     data = data.to(device)
     split_idx = dataset.get_idx_split()
     train_idx = split_idx["train"].to(device)
 
     args = {
         "device": device,
-        "num_layers": 3,
+        "num_layers": 4,
         "hidden_dim": 256,
         "dropout": 0.5,
         "lr": 0.01,
