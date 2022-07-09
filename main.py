@@ -21,33 +21,27 @@ if __name__ == "__main__":
     split_idx = dataset.get_idx_split()
     train_idx = split_idx["train"].to(device)
 
-    args = {
-        "device": device,
-        "num_layers": 4,
-        "hidden_dim": 256,
-        "dropout": 0.5,
-        "lr": 0.01,
-        "epochs": 200,
-    }
+    num_epochs = 200
+    lr = 0.01
 
     model = GCN(
-        data.num_features,
-        args["hidden_dim"],
-        dataset.num_classes,
-        args["num_layers"],
-        args["dropout"],
+        input_dim=data.num_features,
+        hidden_dim=256,
+        output_dim=dataset.num_classes,
+        num_layers=4,
+        dropout=0.5,
     ).to(device)
     model.reset_parameters()
 
-    evaluator = Evaluator(name="ogbn-arxiv")
+    evaluator = Evaluator(name=dataset_name)
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=args["lr"])
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     loss_fn = F.nll_loss
 
     best_model = None
     best_valid_acc = 0
 
-    for epoch in range(1, 1 + args["epochs"]):
+    for epoch in range(1, 1 + num_epochs):
         loss = train_a_step(model, data, train_idx, optimizer, loss_fn)
         result = evaluate(model, data, split_idx, evaluator)
         train_acc, valid_acc, test_acc = result
