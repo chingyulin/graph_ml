@@ -7,7 +7,7 @@ from torch_geometric.data import Data
 
 from graph_ml.model import GCN
 from graph_ml.ogb_wrapper import Evaluator, PygNodePropPredDataset
-from graph_ml.trainer import test, train
+from graph_ml.trainer import evaluate, train_a_step
 
 if __name__ == "__main__":
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -48,8 +48,8 @@ if __name__ == "__main__":
     best_valid_acc = 0
 
     for epoch in range(1, 1 + args["epochs"]):
-        loss = train(model, data, train_idx, optimizer, loss_fn)
-        result = test(model, data, split_idx, evaluator)
+        loss = train_a_step(model, data, train_idx, optimizer, loss_fn)
+        result = evaluate(model, data, split_idx, evaluator)
         train_acc, valid_acc, test_acc = result
         if valid_acc > best_valid_acc:
             best_valid_acc = valid_acc
@@ -62,7 +62,9 @@ if __name__ == "__main__":
             f"Test: {100 * test_acc:.2f}%"
         )
 
-    best_result = test(best_model, data, split_idx, evaluator, save_model_results=True)
+    best_result = evaluate(
+        best_model, data, split_idx, evaluator, save_model_results=True
+    )
     train_acc, valid_acc, test_acc = best_result
     print(
         f"Best model: "

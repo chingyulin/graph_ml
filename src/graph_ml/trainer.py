@@ -6,7 +6,7 @@ from torch_geometric.data import Data
 from graph_ml.model import GCN
 
 
-def train(model: GCN, data: Data, train_idx, optimizer, loss_fn):
+def train_a_step(model: GCN, data: Data, train_idx, optimizer, loss_fn):
     model.train()
     optimizer.zero_grad()
     out = model(data.x, data.adj_t)
@@ -18,9 +18,8 @@ def train(model: GCN, data: Data, train_idx, optimizer, loss_fn):
     return loss.item()
 
 
-# Test function here
 @torch.no_grad()
-def test(
+def evaluate(
     model: GCN, data: Data, split_idx, evaluator: Evaluator, save_model_results=False
 ):
 
